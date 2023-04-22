@@ -6,6 +6,17 @@
 <div class="col-12">
     <div class="bg-light rounded h-100 p-4">
         <h6 class="mb-4 fs-3">Danh sách đơn hàng đang vận chuyển</h6>
+        <?php 
+                    $success = Session::get('success');
+                    $orderId = Session::get('orderId');
+                   
+                    if($success && $orderId){
+                        echo '<div class="alert alert-success">'.$success.'<a href="'.URL::to('/admin/order-completed#'.$orderId).'"> Chuyển đến đơn hàng đang vận chuyển</a></div>' ;
+                        Session::put('success',null);
+                        Session::put('orderId',null);
+
+                    }
+                    ?>
         <div class="table-responsive">
             <table data-toolbar="#toolbar" data-toggle="table" class="table table-hover">
                 <thead>
@@ -38,19 +49,27 @@
                             <div class="th-inner ">Ngày đặt</div>
                             <div class="fht-cell"></div>
                         </th>
-                        <th style="">
+                        <th style="text-align: right">
                             <div class="th-inner ">Hành động</div>
                             <div class="fht-cell"></div>
                         </th>
                     </tr>
                 </thead>
                 <tbody>
+                    <?php $new_check =1 ?>
                     @foreach ($all_order as $order)
                  
                     <tr data-index="0">
                         <td style="">
-                            <p>{{$order->order_id}}</p>
-                            <a href="{{URL::to('/admin/order-details/'.$order->order_id)}}">Xem chi tiết</a>
+                            <p>{{$order->order_id}}
+                            <?php if($new_check == 1){
+                                ?>
+                                    <span style="color:red">(New)</span>
+                                <?php
+                                    $new_check = 0;
+                                }?> 
+                            </p>
+                            <a href="{{URL::to('/admin/order-details/'.$order->order_id)}}" id="{{$order->order_id}}">Xem chi tiết</a>
                         </td>
                         <td style="">
                             <p>{{$order->name}}</p>
@@ -70,7 +89,7 @@
                         <td style="">{{$order->type}}</td>
                         <td style="">{{$order->created_at}}</td>
 
-                        <td class="form-group" style="">
+                        <td class="form-group" style="text-align: right; margin-right:10%">
                             <a onclick="return confirm('Xác nhận khách hàng đã ký nhận hàng?')" href="{{URL::to('/admin/order-comfim/'.$order->order_id)}}" class="btn btn-primary">
                                 <i class="fas fa-pen"></i>
                             </a>

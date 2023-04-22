@@ -1,5 +1,6 @@
 <!-- Favicon -->
-<link href="{{asset('/assets/admin/img/favicon.ico')}} rel="icon">
+<link rel="shortcut icon" type="image/x-icon" href="{{asset('/assets/admin/img/admin.ico')}}">
+
 
 <!-- Google Web Fonts --> 
 <link rel="preconnect" href="https://fonts.googleapis.com">

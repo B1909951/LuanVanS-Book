@@ -3,10 +3,15 @@
 @section('content')
 
 <div class="container-fluid pt-4 px-4">
+    
     <div class="row g-4">
         <div class="col-sm-12 col-xl-12">
+            
             <div class="bg-light rounded h-100 p-4">
+                
                 <div class="col-md-8">
+                    <h3 class="title text-left">Thêm sản phẩm</h3>
+
                     <?php 
                     $error = Session::get('error');
                     $success = Session::get('success');
@@ -73,8 +78,9 @@
                             <img id="output" src="" width="250">
                         </div>
                         <button name="sbm" type="submit" class="btn btn-success">Thêm mới</button>
-                        <button type="reset" class="btn btn-success">Làm mới</button>
-                        
+                        <a href="{{URL::to('/admin/product-manage')}}" class="btn btn-danger    ">
+                            Trở về</i>
+                        </a>                        
                     </form>
                 </div>
             </div>

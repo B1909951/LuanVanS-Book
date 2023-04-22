@@ -7,11 +7,18 @@
         <div class="col-sm-12 col-xl-12">
             <div class="bg-light rounded h-100 p-4">
                 <div class="col-md-8">
+                    <h3 class="title text-left">Cập nhật thể loại</h3>
+
                     <?php 
                     $error = Session::get('error');
+                    $success = Session::get('success');
                     if($error){
                         echo '<div class="alert alert-danger">'.$error.'</div>' ;
                         Session::put('error',null);
+                    }
+                    if($success){
+                        echo '<div class="alert alert-success">'.$success.'</div>' ;
+                        Session::put('success',null);
                     }
                     ?>
                     <form action="{{URL::to('/admin/genre-edit-genre')}}" role="form" method="post" >
@@ -46,7 +53,9 @@
                         </fieldset>
                         
                         <button name="sbm" type="submit" class="btn btn-success">Cập nhật</button>
-                        <button type="reset" class="btn btn-success">Làm mới</button>
+                        <a href="{{URL::to('/admin/genre-manage')}}" class="btn btn-danger    ">
+                            Trở về</i>
+                        </a> 
                     </form>
                 </div>
             </div>

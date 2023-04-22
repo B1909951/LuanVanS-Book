@@ -2,7 +2,6 @@
 <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="{{asset('/assets/admin/js/script.js')}}"></script>
-<script src="{{asset('/assets/admin/js/spinner_recommend.js')}}"></script>
 
 <script src="{{asset('/assets/admin/lib/chart/chart.min.js')}}"></script>
 <script src="{{asset('/assets/admin/lib/easing/easing.min.j')}}s"></script>
@@ -11,6 +10,22 @@
 <script src="{{asset('/assets/admin/lib/tempusdominus/js/moment.min.js')}}"></script>
 <script src="{{asset('/assets/admin/lib/tempusdominus/js/moment-timezone.min.js')}}"></script>
 <script src="{{asset('/assets/admin/lib/tempusdominus/js/tempusdominus-bootstrap-4.min.js')}}"></script>
+<script>
+ 
+    document.getElementById('create_list').addEventListener('click', function(e){
+      
+        console.log(this.parentElement)
+
+        var a = confirm('Thao tác sẽ rất mất thời gian, bạn nên thực hiện vào thời điểm ít khách truy cập!');
+        if(!a){
+            e.preventDefault()
+                return
+        }
+        if(a) document.querySelector('.loading_create_list').classList.remove('d-none')
+
+    })
+</script>
+
 
 <!-- Template Javascript -->
 <script src="{{asset('/assets/admin/js/main.js')}}"></script>

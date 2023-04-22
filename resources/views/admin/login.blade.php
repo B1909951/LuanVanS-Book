@@ -51,6 +51,7 @@
                     if($error_login){
                         echo '<div class="alert alert-danger">'.$error_login.'</div>' ;
                     }
+                    Session::put('error_login', null);
                     ?>
 
                     </div>

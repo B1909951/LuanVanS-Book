@@ -1342,9 +1342,11 @@ h2.title {
     overflow: hidden;
 }
 
+
+/* 
 .login-form {}
 
-.signup-form {}
+.signup-form {} */
 
 .login-form h2,
 .signup-form h2 {
@@ -2153,10 +2155,10 @@ textarea {
 .check_out:hover {
     color: #fc4f13;
     background: #e6e4df;
-    bor
 }
 
-.sinlge-post-meta li {
+
+/* .single-post-meta li {
     background: #e6e4df;
     color: #363432;
     float: left;
@@ -2166,14 +2168,15 @@ textarea {
     padding: 0 10px 0 0;
     position: relative;
     text-transform: uppercase;
-}
+} */
 
-.sinlge-post-meta li i {
+
+/* .sinlge-post-meta li i {
     background: #fc4f13;
     color: #FFFFFF;
     margin-right: 10px;
     padding: 8px 10px;
-}
+} */
 
 .category-products .panel-default .panel-heading .panel-title a:hover,
 .brands-name .nav-stacked li a:hover {
@@ -2367,4 +2370,9 @@ textarea {
 
 .contact-info .social-networks ul li a:hover {
     color: #fc4f13;
+}
+
+.add-hover-cart:hover {
+    color: #fc4f13;
+    background: #e6e4df;
 }

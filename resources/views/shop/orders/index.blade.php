@@ -68,7 +68,6 @@
                         <tr class="cart_menu">
                             <td class="image">Sản phẩm</td>
                             <td class="description"></td>
-                            <td class="price">Giá</td>
                             <td  class="total" style="width: 40%; text-align: center;: right ">Đánh giá</td>
                         </tr>
                     </thead>
@@ -82,9 +81,7 @@
                                 <h4><a href="">{{$pro->name}}</a></h4>
                                 <p>Web ID: {{$pro->product_id}}</p>
                             </td>
-                            <td class="cart_price">
-                                <p>{{number_format($pro->price, 0, '.',',').' vnđ'}}</p>
-                            </td>
+                            
                             <?php $r = null;
                                 foreach($ratings as $rate){
                                     if($rate->product_id == $pro->product_id){

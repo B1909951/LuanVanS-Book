@@ -6,6 +6,18 @@
 <div class="col-12">
     <div class="bg-light rounded h-100 p-4">
         <h6 class="mb-4 fs-3">Chi tiết đơn hàng</h6>
+        <?php 
+            $error = Session::get('error');
+            $success = Session::get('success');
+            if($error){
+                echo '<div class="alert alert-danger">'.$error.'</div>' ;
+                Session::put('error',null);
+            }
+            if($success){
+                echo '<div class="alert alert-success">'.$success.'</div>' ;
+                Session::put('success',null);
+            }
+        ?>
         <div class="table-responsive">
             <table data-toolbar="#toolbar" data-toggle="table" class="table table-hover">
                 <thead>
@@ -24,6 +36,10 @@
                         </th>
                         <th style="">
                             <div class="th-inner sortable">Giá</div>
+                            <div class="fht-cell"></div>
+                        </th>
+                        <th style="">
+                            <div class="th-inner sortable">Số lượng</div>
                             <div class="fht-cell"></div>
                         </th>
                         <th style="">
@@ -47,8 +63,9 @@
                             <img width="100" src="{{asset("/assets/clients/pro_img/$pro->image")}}" width="75">
                         </td>
                         
-                        <td style="">{{number_format($pro->price, 0, '.',',').' vnđ'}}</td>
-                        
+                        <td style="">{{number_format($pro->current_price, 0, '.',',').' vnđ'}}</td>
+                        <td style="">{{$pro->count}} Cuốn</td>
+
                         
                         <td style="">
                             

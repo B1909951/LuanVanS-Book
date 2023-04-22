@@ -6,6 +6,18 @@
 <div class="col-12">
     <div class="bg-light rounded h-100 p-4">
         <h6 class="mb-4 fs-3">Tài khoản nhân viên</h6>
+        <?php 
+            $error = Session::get('error');
+            $success = Session::get('success');
+            if($error){
+                echo '<div class="alert alert-danger">'.$error.'</div>' ;
+                Session::put('error',null);
+            }
+            if($success){
+                echo '<div class="alert alert-success">'.$success.'</div>' ;
+                Session::put('success',null);
+            }
+        ?>
         <div class="table-responsive">
             <div id="toolbar" class="btn-group">
                 <a href="{{URL::to('/admin-add')}}" class="btn btn-success">
@@ -35,7 +47,7 @@
                             <div class="th-inner ">Số điện thoại</div>
                             <div class="fht-cell"></div>
                         </th>
-                        <th style="">
+                        <th style="text-align: right">
                             <div class="th-inner ">Hành động</div>
                             <div class="fht-cell"></div>
                         </th>
@@ -51,8 +63,8 @@
                         </td>
                         <td style="">{{$ad->email}}</td>
                         <td style="">{{$ad->phone}}</td>
-                        <td class="form-group" style="">
-                            <a href="{{URL::to('/admin-edit/'.$ad->id)}}" class="btn btn-primary">
+                        <td class="form-group" style="text-align: right; margin-right:10%">
+                            <a href="{{URL::to('/admin-edit/'.$ad->admin_id)}}" class="btn btn-primary">
                                 <i class="fas fa-pen"></i>
                             </a>
                             <a  onclick="return confirm('Bạn có muốn xóa nhân viên này?')" href="{{URL::to('/admin-delete/'.$ad->admin_id)}}" class="btn btn-danger">

@@ -14,7 +14,7 @@
                         <td class="image">Sản phẩm</td>
                         <td class="description"></td>
                         <td class="price">Giá</td>
-                        <td class="quantity">Số lượng</td>
+                        <td class="quantity">Số lượng(1-100)</td>
                         <td class="total">Tiền</td>
                         <td></td>
                     </tr>
@@ -39,7 +39,9 @@
                                 <form action="{{URL::to('/cart-edit-count')}}" method="POST">
                                     @csrf
                                     <input type="hidden" name="cart_id" value="{{$pro->cart_id}}">
-                                    <input class="cart_quantity_input" type="text" name="count" value="{{$pro->count}}" autocomplete="off" size="2" min="1" style="padding: 5px; padding-bottom:2px; margin-right:5px;">
+                                    {{-- <input class="cart_quantity_input" type="text" name="count" value="{{$pro->count}}" autocomplete="off" size="2"style="padding: 5px; padding-bottom:2px; margin-right:5px;"> --}}
+                                    <input class="cart_quantity_input" type="text" name="count" value="{{$pro->count}}" autocomplete="off" size="2"style="padding: 5px; padding-bottom:2px; margin-right:5px;" oninput="this.value = Math.max(Math.min(this.value, 100), 1)">
+
                                     <button type="submit" class="btn btn-warning">Cập nhật</button>
                                 </form>
                             </div>
@@ -66,24 +68,32 @@
         </div>
         <div class="row">
             
-           
-            <div class="col-sm-6">
+            
+            <div class="col-sm-6" id="Coupon">
                 <div class="total_area">
                     <ul class="user_info">
-                        <form action="{{URL::to('/cart')}}" method="POST">
+                        <form action="{{URL::to('/cart#Coupon')}}" method="POST">
                             @csrf
                             <label>Nhập coupon:</label>
-                            <input type="text" name="code" value="@if($coupon!=null){{$coupon->code}}@endif" required>
-                            @if($coupon!=null)<div style="color: rgb(119, 199, 0); margin-top:5px" >Bạn được giảm {{$coupon->value}}%</div>@endif
+                            <input type="text" name="code" value="@if($coupon!=null && $coupon->expire_at >= date('Y-m-d')){{$coupon->code}}@endif" required>
+
+                            @if($coupon_err == 404)<div style="color: red; margin-top:5px" >Coupon không hợp lệ</div>
+                            @endif
+                            @if($coupon_err == 409)<div style="color: red; margin-top:5px" >Coupon đã được sử dụng</div>
+                            @endif
+                            @if($coupon_err == 400)<div style="color: red; margin-top:5px" >Coupon đã hết hạn</div>
+                            @endif
+                            @if($coupon!=null && $coupon->expire_at >= date('Y-m-d'))<div style="color: rgb(119, 199, 0); margin-top:5px" >Bạn được giảm {{$coupon->value}}%</div>
+                            @endif
                             <button type="submit"  class="btn btn-default update" style="margin-left:0px;">Kiểm tra Coupon</button>
                         </form>
                     </ul>
                     <ul>
                           
-                            <li>Coupon<span>@if($coupon!=null){{$coupon->code}} @else Không có@endif</span></li>
+                            <li>Coupon<span>@if($coupon!=null && $coupon->expire_at >= date('Y-m-d')){{$coupon->code}} @else Không có@endif</span></li>
                             <li>Tiền sản phẩm<span>{{number_format($total, 0, '.',',').' vnđ'}}</span></li>
-                            <li>Tiền giảm<span>@if($coupon!=null){{number_format($total * $coupon->value / 100, 0, '.',',').' vnđ'}} @else 0 vnđ@endif</span></li>
-                            <li>Tổng tiền<span>@if($coupon!=null){{number_format($total - $total * $coupon->value / 100, 0, '.',',').' vnđ'}} @else {{number_format($total, 0, '.',',').' vnđ'}}@endif</span></li>
+                            <li>Tiền giảm<span>@if($coupon!=null && $coupon->expire_at >= date('Y-m-d')){{number_format($total * $coupon->value / 100, 0, '.',',').' vnđ'}} @else 0 vnđ@endif</span></li>
+                            <li>Tổng tiền<span>@if($coupon!=null && $coupon->expire_at >= date('Y-m-d')){{number_format($total - $total * $coupon->value / 100, 0, '.',',').' vnđ'}} @else {{number_format($total, 0, '.',',').' vnđ'}}@endif</span></li>
                             
                     </ul>      
                 </div>
@@ -100,13 +110,12 @@
                             <li>Email<span>{{$customer->email}}</span></li>
                             <input type="hidden" name="customer_id" id="" value="{{$customer->customer_id}}">
                             <input type="hidden" name="sub_total" id="" value="{{$total}}">
-                            <input type="hidden" name="coupon_id" id="" value="@if($coupon!=null){{$coupon->coupon_id}}@else 1 @endif">
-                            <input type="hidden" name="total" id="" value="@if($coupon!=null){{$total - $total * $coupon->value / 100}}@else {{$total}} @endif">
+                            <input type="hidden" name="coupon_id" id="" value="@if($coupon!=null && $coupon->expire_at >= date('Y-m-d')){{$coupon->coupon_id}}@else 1 @endif">
+                            <input type="hidden" name="total" id="" value="@if($coupon!=null && $coupon->expire_at >= date('Y-m-d')){{$total - $total * $coupon->value / 100}}@else {{$total}} @endif">
 
                             <li style="padding-bottom: 10px">Hình thức thanh toán<span>
                                 <select name="type" id="">
-                                    <option value="1">Trực tiếp</option>
-                                    <option value="Chuyển khoản">Chuyển khoản</option>
+                                    <option value="Trực tiếp">Trực tiếp</option>
                                     <option value="Momo">Momo</option>
                                 </select>
                             </span></li>

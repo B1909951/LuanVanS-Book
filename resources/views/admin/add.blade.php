@@ -3,17 +3,25 @@
 @section('content')
 
 <div class="container-fluid pt-4 px-4">
+    
     <div class="row g-4">
         <div class="col-sm-12 col-xl-12">
             <div class="bg-light rounded h-100 p-4">
                 <div class="col-md-8">
+                    <h3 class="title text-left">Thêm nhân viên</h3>
+
                     <?php 
-                    $error = Session::get('error');
-                    if($error){
-                        echo '<div class="alert alert-danger">'.$error.'</div>' ;
-                        Session::put('error',null);
-                    }
-                    ?>
+            $error = Session::get('error');
+            $success = Session::get('success');
+            if($error){
+                echo '<div class="alert alert-danger">'.$error.'</div>' ;
+                Session::put('error',null);
+            }
+            if($success){
+                echo '<div class="alert alert-success">'.$success.'</div>' ;
+                Session::put('success',null);
+            }
+        ?>
                     <form id="add-user" action="{{URL::to('/admin-add-admin')}}" role="form" method="post" enctype="multipart/form-data">
                         @csrf
                         <div class="form-group">
@@ -48,7 +56,9 @@
                             <img id="output" src="" width="250">
                         </div>
                         <button name="sbm" type="submit" class="btn btn-success">Thêm mới</button>
-                        <button type="reset" class="btn btn-success">Làm mới</button>
+                        <a href="{{URL::to('/admin-manage')}}" class="btn btn-danger    ">
+                            Trở về</i>
+                        </a> 
                     </form>
                 </div>
             </div>

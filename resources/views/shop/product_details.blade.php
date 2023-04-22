@@ -32,19 +32,20 @@
                 <span>
                     <h2 style="color:#fc4f13">{{number_format($product->price, 0, '.',',').' vnđ'}}</h2>
                     <form action="{{URL::to('/add-to-cart')}}" method="POST">
+                    @if($product->show == 1) 
                         @csrf
-                        <label> Số lượng:</label>
+                        <label> Số lượng(1-100):</label>
                         <input type="hidden" value="{{Session::get('customer_id')}}" name="id"/>
                         <input type="hidden" value="{{$product->id}}" name="id"/>
-                        <input type="number" value="1" min="1" name="count"/>
-                        @if($product->show == 1) <button type="submit" class="btn btn-fefault cart" >
+                        <input type="number" value="1" min="1" max="100" name="count"/>
+                        <button type="submit" class="btn btn-fefault cart" >
                             <i class="fa fa-shopping-cart"></i>
                             Thêm vào giỏ hàng
                         </button>
                     @endif 
                     </form>
                 </span>
-                <p><b>Tình trạng:</b>@if($product->show == 1) Còn hàng @else  Hết hàng @endif </p>
+                <p><b>Tình trạng:</b>@if($product->show == 1) Còn hàng @else  Ngừng kinh doanh @endif </p>
             </div><!--/product-information-->
         </div>
     </div><!--/product-details-->

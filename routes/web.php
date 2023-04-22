@@ -16,9 +16,10 @@ y the RouteServiceProvider within a group which
 //shop
 Route::get('','App\Http\Controllers\ShopController@index');
 Route::get('product-details/{id}','App\Http\Controllers\ShopController@product_details');
-Route::get('cate-products/{id}','App\Http\Controllers\ShopController@cate_products');
-Route::get('genre-products/{id}','App\Http\Controllers\ShopController@genre_products');
+Route::get('cate-products/{id}/{page?}','App\Http\Controllers\ShopController@cate_products');
+Route::get('genre-products/{id}/{page?}','App\Http\Controllers\ShopController@genre_products');
 Route::post('search','App\Http\Controllers\ShopController@search');
+Route::get('page/{page?}','App\Http\Controllers\ShopController@page');
 
 //rate
 Route::post('add-rate','App\Http\Controllers\RateController@add_rate');
@@ -59,6 +60,10 @@ Route::post('admin-add-admin','App\Http\Controllers\AdminController@add_admin');
 Route::get('admin-delete/{id}','App\Http\Controllers\AdminController@delete');
 Route::get('admin-edit/{id}','App\Http\Controllers\AdminController@edit');
 Route::post('admin-edit-admin','App\Http\Controllers\AdminController@edit_admin');
+Route::get('admin-change-password/{id}','App\Http\Controllers\AdminController@change_password_admin');
+Route::post('admin-change-password-admin','App\Http\Controllers\AdminController@change_password');
+
+
 
 //genre
 Route::get('admin/genre-manage','App\Http\Controllers\GenreController@manage');
@@ -97,13 +102,13 @@ Route::get('admin/customer-recover/{id}','App\Http\Controllers\CustomerControlle
 Route::get('admin/customer-deletedb/{id}','App\Http\Controllers\CustomerController@deletedb');
 
 //rate
-Route::get('admin/rate-manage','App\Http\Controllers\RateController@manage');
+Route::get('admin/rate-manage/{page?}','App\Http\Controllers\RateController@manage');
 Route::get('admin/rate-add','App\Http\Controllers\RateController@add');
 Route::get('admin/rate-delete/{id}','App\Http\Controllers\RateController@delete');
 Route::get('admin/rate-recover/{id}','App\Http\Controllers\RateController@recover');
 Route::get('admin/rate-deletedb/{id}','App\Http\Controllers\RateController@deletedb');
 //product
-Route::get('admin/product-manage','App\Http\Controllers\ProductController@manage');
+Route::get('admin/product-manage/{page?}','App\Http\Controllers\ProductController@manage');
 Route::get('admin/product-add','App\Http\Controllers\ProductController@add');
 Route::post('admin/product-add-product','App\Http\Controllers\ProductController@add_product');
 Route::get('admin/product-delete/{id}','App\Http\Controllers\ProductController@delete');
@@ -115,8 +120,15 @@ Route::get('admin/add-product-recommend','App\Http\Controllers\ProductController
 Route::get('admin/add-product-recommend','App\Http\Controllers\ProductController@add_product_recommend');
 Route::get('admin/product-edit-recommend/{id}','App\Http\Controllers\ProductController@edit_recommend');
 
+// send mail
+Route::get('admin/coupon/send-coupon','App\Http\Controllers\CouponController@send_coupon');
 
+Route::get('notfound','App\Http\Controllers\ShopController@notfound');
 
+Route::fallback(function () {
+    // trả về view notfound.blade.php
+    return redirect('/notfound');
+});
 
 
 

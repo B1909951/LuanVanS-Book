@@ -19,6 +19,7 @@ class CustomerController extends Controller
     public function index(){
 
         if(!Session::get('customer_id')){
+            Session::put('error_login', "Vui lòng đăng nhập để thực hiện chức năng!");
             return Redirect::to('customer-login');
         }
         $notif = Notification::where('customer_id',Session::get('customer_id'))->orderby('notif_id','desc')->limit(6)->get();
@@ -106,7 +107,8 @@ class CustomerController extends Controller
     }
     //admin
     public function manage(){
-        if(!Session::get('id')){
+        if(!Session::get('id') ){
+            Session::put('error_login', "Vui lòng đăng nhập để thực hiện chức năng!");
             return Redirect::to('admin-login');
         }
         $admin = Admin::where('admin_id',Session::get('id'))->get();
@@ -114,29 +116,42 @@ class CustomerController extends Controller
         return view('admin/customer/manage')->with('admin',$admin)->with('all_customer',$all_customer);
     }
     public function delete($id){
-        if(!Session::get('id')){
+        if(!Session::get('id') ){
+            Session::put('error_login', "Vui lòng đăng nhập để thực hiện chức năng!");
             return Redirect::to('admin-login');
         }
         $customer = customer::find($id);
         if($customer){
             $customer['status'] = 2;
             $customer->update();
+            Session::put('success',"Khóa thành công!");
+
+        }else{
+            Session::put('error',"Khóa thất bại!");
         }
         return Redirect::to('admin/customer-manage');
     }
     public function recover($id){
-        if(!Session::get('id')){
+        if(!Session::get('id') ){
+            Session::put('error_login', "Vui lòng đăng nhập để thực hiện chức năng!");
             return Redirect::to('admin-login');
         }
         $customer = Customer::find($id);
         if($customer){
-            $customer['status'] = 1;
-            $customer->update();
+            if($customer['status'] == 2){
+                $customer['status'] = 1;
+                $customer->update();
+                Session::put('success',"Mở khóa thành công!");
+            }else{
+                Session::put('error',"Mở khóa thất bại!");
+            }
+            
         }
         return Redirect::to('admin/customer-manage');
     }
     public function deletedb($id){
-        if(!Session::get('id')){
+        if(!Session::get('id') ){
+            Session::put('error_login', "Vui lòng đăng nhập để thực hiện chức năng!");
             return Redirect::to('admin-login');
         }
         $customer = Customer::find($id);

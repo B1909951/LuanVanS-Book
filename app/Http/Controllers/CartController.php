@@ -23,6 +23,7 @@ class CartController extends Controller
     public function index(Request $request){
 
         if(!Session::get('customer_id')){
+            Session::put('error_login', "Vui lòng đăng nhập để thực hiện chức năng!");
             return Redirect::to('customer-login');
         }
         $notif = Notification::where('customer_id',Session::get('customer_id'))->orderby('notif_id','desc')->limit(6)->get();
@@ -30,17 +31,30 @@ class CartController extends Controller
         $customer = Customer::find(Session::get('customer_id'));
         $all_category = DB::table('categories')->where('categories.show','1')->get();
         $all_genre = DB::table('genres')->where('genres.show','1')->get();
-        $coupon = null;
-        if($request){
-            $coupon = DB::table('coupons')->where('coupons.code',$request->code)->where('coupons.status', 1)->first();
-        }
         $carts = DB::table('carts')->join('products','products.id','=','carts.product_id')->where('carts.customer_id',Session::get('customer_id'))->where('products.show','1')->select('carts.cart_id', 'carts.product_id','carts.count','products.name','products.price','products.image')->get();
-        return view('shop/cart/index')->with('carts',$carts)->with('coupon',$coupon)->with('all_genre',$all_genre)->with('all_category',$all_category)->with('customer',$customer)->with('notif',$notif);
+
+        $coupon = null;
+        if($request->code != null){
+            $coupon = DB::table('coupons')->where('coupons.code',$request->code)->where('coupons.status',1)->first();
+            if($coupon == null){
+                return view('shop/cart/index')->with('carts',$carts)->with('coupon',null)->with('all_genre',$all_genre)->with('all_category',$all_category)->with('customer',$customer)->with('notif',$notif)->with('coupon_err', 404);
+            }
+            $used_coupon = DB::table('orders')->where('customer_id',session::get('customer_id'))->where('coupon_id',$coupon->coupon_id)->first();
+            if($used_coupon!= null){
+                return view('shop/cart/index')->with('carts',$carts)->with('coupon',null)->with('all_genre',$all_genre)->with('all_category',$all_category)->with('customer',$customer)->with('notif',$notif)->with('coupon_err', 409);
+            }
+            if($coupon->expire_at < date('Y-m-d')){
+                return view('shop/cart/index')->with('carts',$carts)->with('coupon',null)->with('all_genre',$all_genre)->with('all_category',$all_category)->with('customer',$customer)->with('notif',$notif)->with('coupon_err', 400);
+            }
+            return view('shop/cart/index')->with('carts',$carts)->with('coupon',$coupon)->with('all_genre',$all_genre)->with('all_category',$all_category)->with('customer',$customer)->with('notif',$notif)->with('coupon_err', null);
+        }
+        return view('shop/cart/index')->with('carts',$carts)->with('all_genre',$all_genre)->with('all_category',$all_category)->with('customer',$customer)->with('notif',$notif)->with('coupon_err', null)->with('coupon',$coupon);
     }
     
     public function add(Request $request){
 
         if(!Session::get('customer_id')){
+            Session::put('error_login', "Vui lòng đăng nhập để thực hiện chức năng!");
             return Redirect::to('customer-login');
         }
         $all_category = DB::table('categories')->where('categories.show','1')->get();
@@ -49,8 +63,20 @@ class CartController extends Controller
         if($cart){
             $update_cart = Cart::find($cart->cart_id);
             $update_cart->count = $update_cart->count + $request->count;
-            $update_cart->update();
 
+            if($update_cart->count >=1 && $update_cart->count <=100 )
+            {
+                $update_cart->count = $update_cart->count;
+            }else
+            if(!is_numeric($request->count) || $update_cart->count <1)
+                {
+                    $update_cart->count = 1;
+                }else
+            
+            if($update_cart->count >100){
+                $update_cart->count = 100;
+            }
+            $update_cart->update();
         }else{
             $cart = new Cart();
             if(!$request) return Redirect->back();
@@ -66,7 +92,19 @@ class CartController extends Controller
     public function edit_count(Request $request){
         $cart = Cart::find($request->cart_id);
         if($cart){
-            $cart->count = $request->count;
+            
+            if($cart->count >=1 && $cart->count <=100 )
+            {
+                $cart->count = $request->count;
+            }else
+            if(!is_numeric($request->count) || $cart->count <1)
+                {
+                    $cart->count = 1;
+                }else
+            
+            if($cart->count >100){
+                $cart->count = 100;
+            }
             $cart->update();
             return Redirect::to('cart');
         }
@@ -79,6 +117,7 @@ class CartController extends Controller
     }
     public function add_order(Request $request){
         if(!Session::get('customer_id')){
+            Session::put('error_login', "Vui lòng đăng nhập để thực hiện chức năng!");
             return Redirect::to('customer-login');
         }
         $all_category = DB::table('categories')->where('categories.show','1')->get();
@@ -101,6 +140,8 @@ class CartController extends Controller
             $add_details_order = new Details_order();
             $add_details_order->customer_id = Session::get('customer_id');
             $add_details_order->product_id =  $cart->product_id;
+            $product_in_cart = Product::find($cart->product_id);
+            $add_details_order->current_price = $product_in_cart->price;
             $add_details_order->count =  $cart->count;
             $add_details_order->order_id =  $order->order_id;
             $add_details_order->save();
@@ -113,6 +154,7 @@ class CartController extends Controller
     public function orders(){
         // order
         if(!Session::get('customer_id')){
+            Session::put('error_login', "Vui lòng đăng nhập để thực hiện chức năng!");
             return Redirect::to('customer-login');
         }
         $notif = Notification::where('customer_id',Session::get('customer_id'))->orderby('notif_id','desc')->limit(6)->get();
@@ -131,6 +173,7 @@ class CartController extends Controller
     }
     public function order_details($id){
         if(!Session::get('customer_id')){
+            Session::put('error_login', "Vui lòng đăng nhập để thực hiện chức năng!");
             return Redirect::to('customer-login');
         }
         $notif = Notification::where('customer_id',Session::get('customer_id'))->orderby('notif_id','desc')->limit(6)->get();

@@ -49,7 +49,7 @@
             <a href="{{URL::to('/admin/cate-manage')}}" class="nav-item nav-link @if($pos = strpos($currentUrl, "admin/cate")) active @endif"><i class="fa fa-folder-open me-2"></i>Danh mục</a>
             
             <a href="{{URL::to('/admin/genre-manage')}}" class="nav-item nav-link @if($pos = strpos($currentUrl, "admin/genre")) active @endif"><i class="fa fa-tags me-2"></i>Thể loại</a>
-            <a href="{{URL::to('/admin/product-manage')}}" class="nav-item nav-link @if($pos = strpos($currentUrl, "admin/product")) active @endif"><i class="fa fa-book me-2"></i>Sản phẩm</a>
+            <a href="{{URL::to('/admin/product-manage')}}" class="nav-item nav-link @if($pos = strpos($currentUrl, "admin/product/1")) active @endif"><i class="fa fa-book me-2"></i>Sản phẩm</a>
             <a href="{{URL::to('/admin/rate-manage')}}" class="nav-item nav-link @if($pos = strpos($currentUrl, "admin/rate")) active @endif"><i class="fa fa-star me-2"></i>Đánh giá</a>
             <a href="{{URL::to('/admin/coupon-manage')}}" class="nav-item nav-link @if($pos = strpos($currentUrl, "admin/coupon")) active @endif"><i class="fa fa-gift me-2"></i>Mã giảm</a>
             <a href="{{URL::to('/admin/customer-manage')}}" class="nav-item nav-link @if($pos = strpos($currentUrl, "admin/customer")) active @endif"><i class="fa fa-user me-2"></i>Khách hàng</a>

@@ -1,13 +1,12 @@
 @extends('shop.layouts.main')
-@section('title', 'S-Book | Thể loại')
+@section('title', 'S-Book | Trang chủ')
 @section('content')
 
-<div class="col-sm-9 padding-right" id="products" >
-	<div class="features_items"><!--features_items-->
-		<h2 class="title text-center" style="padding-top: 5px;">Sản phẩm thuộc Thể loại: {{$genre_name}}</h2>
-        @if(!isset($genre_products[0])) <h4>Không có sản phẩm thuộc thể loại này</h4>
-        @else
-		@foreach ($genre_products as $product)
+<div class="col-sm-9 padding-right">
+	
+	<div class="features_items" id="products" ><!--features_items-->
+		<h2 class="title text-center " style="padding-top: 5px; ">Danh sách sản phẩm trang {{$current_page}}</h2>
+		@foreach ($all_product as $product)
 		<div class="col-sm-4">
 			<a href="{{URL::to('/product-details/'.$product->id)}}">
 			<div class="product-image-wrapper" style="height: 380px">
@@ -33,26 +32,26 @@
 			</a>
 		</div>
 		@endforeach
-        @endif
-	</div><!--/category-tab-->		
+		
+	</div><!--/category-tab-->	
 	<div class="text-center">
 		<ul class="pagination" style="text-align: center ">
 			<?php if (true): ?>
-		  		<li><a href="<?php echo 1; ?>#products"><<</a></li>
+		  		<li><a href="/page/<?php echo 1; ?>#products"><<</a></li>
 			<?php endif; ?>
-		  		<li><a href="<?php echo $current_page - 1; ?>#products" class="active"><</a></li>
+		  		<li><a href="/page/<?php echo $current_page - 1; ?>#products" class="active"><</a></li>
 	  
 			<?php for ($i = max(1, $current_page - 1); $i <= min($current_page + 1, $total_pages); $i++): ?>
     			<?php if ($i == $current_page): ?>
       				<li class="active"><span><?php echo $i; ?></span></li>
     			<?php else: ?>
-      				<li><a href="<?php echo $i; ?>#products"><?php echo $i; ?></a></li>
+      				<li><a href="/page/<?php echo $i; ?>#products"><?php echo $i; ?></a></li>
     			<?php endif; ?>
   			<?php endfor; ?>
 	  
-		  	<li><a href="<?php echo $current_page + 1; ?>#products">></a></li>
+		  	<li><a href="/page/<?php echo $current_page + 1; ?>#products">></a></li>
 			<?php if (true): ?>
-		  	<li><a href="<?php echo $total_pages; ?>#products">>></a></li>
+		  	<li><a href="/page/<?php echo $total_pages; ?>#products">>></a></li>
 			<?php endif; ?>
 	  	</ul>	
 	</div>		

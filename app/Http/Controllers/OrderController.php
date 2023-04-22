@@ -18,31 +18,36 @@ Session_start();
 class OrderController extends Controller
 {
     public function index(){
-        if(!Session::get('id')){
+        if(!Session::get('id') ){
+            Session::put('error_login', "Vui lòng đăng nhập để thực hiện chức năng!");
             return Redirect::to('admin-login');
         }
         $admin = Admin::where('admin_id',Session::get('id'))->get();
-        $all_order = DB::table('orders')->where('orders.status',0)->join('customers','customers.customer_id','=','orders.customer_id')->join('coupons', 'coupons.coupon_id','=','orders.coupon_id','left outer')->select('orders.*','customers.name','customers.phone','coupons.code','coupons.value')->get();
+        $all_order = DB::table('orders')->where('orders.status',0)->join('customers','customers.customer_id','=','orders.customer_id')->join('coupons', 'coupons.coupon_id','=','orders.coupon_id','left outer')->select('orders.*','customers.name','customers.phone','coupons.code','coupons.value')->orderBy('orders.order_id', 'desc')
+        ->get();
         return view('admin/order/index')->with('admin',$admin)->with('all_order',$all_order);
     }
     public function transport(){
-        if(!Session::get('id')){
+        if(!Session::get('id') ){
+            Session::put('error_login', "Vui lòng đăng nhập để thực hiện chức năng!");
             return Redirect::to('admin-login');
         }
         $admin = Admin::where('admin_id',Session::get('id'))->get();
-        $all_order = DB::table('orders')->where('orders.status',1)->join('customers','customers.customer_id','=','orders.customer_id')->join('coupons', 'coupons.coupon_id','=','orders.coupon_id','left outer')->select('orders.*','customers.name','customers.phone','coupons.code','coupons.value')->get();
+        $all_order = DB::table('orders')->where('orders.status',1)->join('customers','customers.customer_id','=','orders.customer_id')->join('coupons', 'coupons.coupon_id','=','orders.coupon_id','left outer')->select('orders.*','customers.name','customers.phone','coupons.code','coupons.value')->orderBy('orders.updated_at', 'desc')->get();
         return view('admin/order/transport')->with('admin',$admin)->with('all_order',$all_order);
     }
     public function completed(){
-        if(!Session::get('id')){
+        if(!Session::get('id') ){
+            Session::put('error_login', "Vui lòng đăng nhập để thực hiện chức năng!");
             return Redirect::to('admin-login');
         }
         $admin = Admin::where('admin_id',Session::get('id'))->get();
-        $all_order = DB::table('orders')->where('orders.status',2)->join('customers','customers.customer_id','=','orders.customer_id')->join('coupons', 'coupons.coupon_id','=','orders.coupon_id','left outer')->select('orders.*','customers.name','customers.phone','coupons.code','coupons.value')->get();
+        $all_order = DB::table('orders')->where('orders.status',2)->join('customers','customers.customer_id','=','orders.customer_id')->join('coupons', 'coupons.coupon_id','=','orders.coupon_id','left outer')->select('orders.*','customers.name','customers.phone','coupons.code','coupons.value')->orderBy('orders.updated_at', 'desc')->get();
         return view('admin/order/completed')->with('admin',$admin)->with('all_order',$all_order);
     }
     public function comfim($id){
-        if(!Session::get('id')){
+        if(!Session::get('id') ){
+            Session::put('error_login', "Vui lòng đăng nhập để thực hiện chức năng!");
             return Redirect::to('admin-login');
         }
         $order = Order::find($id);
@@ -53,10 +58,14 @@ class OrderController extends Controller
         $model->customer_id = $order->customer_id;
         if( $order->status==1) {
             $model->message = "Đơn hàng có mã ".$id." của bạn đang được vận chuyển";
+            Session::put('success',"Đã duyệt đơn hàng có mã ".$id."");
+            Session::put('orderId',$id);
+
         }
         else {
             $model->message = "Đơn hàng có mã ".$id." của bạn đã được ký nhận";
-
+            Session::put('success',"Đã xác nhận giao thành công đơn hàng có mã ".$id."");
+            Session::put('orderId',$id);
         }
         $model->save();
         
@@ -65,7 +74,8 @@ class OrderController extends Controller
         return redirect()->back();
     }
     public function delete($id){
-        if(!Session::get('id')){
+        if(!Session::get('id') ){
+            Session::put('error_login', "Vui lòng đăng nhập để thực hiện chức năng!");
             return Redirect::to('admin-login');
         }
         $order = Order::find($id);
@@ -80,10 +90,11 @@ class OrderController extends Controller
         return redirect()->back();
     }
     public function details($id){
-        if(!Session::get('id')){
+        if(!Session::get('id') ){
+            Session::put('error_login', "Vui lòng đăng nhập để thực hiện chức năng!");
             return Redirect::to('admin-login');
         }
-        $order_details = DB::table('details_orders')->where('order_id',$id)->join('products','products.id','=','details_orders.product_id')->select('products.*','products.id as product_id')->get();
+        $order_details = DB::table('details_orders')->where('order_id',$id)->join('products','products.id','=','details_orders.product_id')->select('products.*','products.id as product_id','details_orders.count','details_orders.current_price')->get();
         $admin = Admin::where('admin_id',Session::get('id'))->get();
         $all_genre = DB::table('product_genres')->distinct()->get(['product_id','name']);
         $all_category = Category::all();

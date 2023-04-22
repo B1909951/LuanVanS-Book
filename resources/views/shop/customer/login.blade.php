@@ -21,7 +21,9 @@
                             $error_login = Session::get('error_login');
                             if($error_login){
                                 echo '<div class="alert alert-danger">'.$error_login.'</div>' ;
+                                
                             }
+                            Session::put('error_login',null);
                             ?>
                             
                             <button type="submit" class="btn btn-default" >Đăng nhập</button>
@@ -48,7 +50,9 @@
                             <?php
                             $error = Session::get('error');
                             if($error){
-                                echo '<div class="alert alert-danger">'.$error.'</div>' ;
+                                echo '<div class="alert alert-danger">'.$error.'</div>' ;                                Session::put('error_login',null);
+                                Session::put('error',null);
+
                             }
                             ?>
                             <button type="submit" class="btn btn-default">Đăng kí</button>

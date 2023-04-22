@@ -20,7 +20,7 @@ class RateController extends Controller
     public function recommend_products(){
 
         
-        $process = new Process(["python3", 'D:\Programs\xampp2\htdocs\S-Book\storage\app\python\code1.py'], env: [
+        $process = new Process(["python3", 'D:\Programs\xampp\htdocs\S_Book\storage\app\python\code1.py'], env: [
             'SYSTEMROOT' => getenv('SYSTEMROOT'),
             'PATH' => getenv("PATH")
           ]);
@@ -66,7 +66,7 @@ class RateController extends Controller
     public function add_rate(request $request){
         $cus_id = Session::get('customer_id');
 
-        $update_rate = DB::table('rates')
+        $update_rate = DB::table('rates')->where('status',1)
         ->where('rates.customer_id',$request->customer_id)->where('rates.product_id',$request->product_id)->first();
         if($update_rate){
             $rate = Rate::find($update_rate->rate_id);
@@ -127,16 +127,31 @@ class RateController extends Controller
         return Redirect()->back();
     }
     //admin
-    public function manage(){
-        if(!Session::get('id')){
+    public function manage($page = 1){
+        if(!Session::get('id') ){
+            Session::put('error_login', "Vui lòng đăng nhập để thực hiện chức năng!");
             return Redirect::to('admin-login');
         }
         $admin = Admin::where('admin_id',Session::get('id'))->get();
-        $all_rate = Rate::join('customers','customers.customer_id','=','rates.customer_id')->join('products','products.id','=','rates.product_id')->select('rates.*','customers.email as customer_email','products.name as product_name', 'products.image as product_image')->orderby('rate_id','desc')->get();
-        return view('admin/rate/manage')->with('admin',$admin)->with('all_rate',$all_rate);
+        $per_page = 10;
+        // Tính toán số trang
+        $total_count = Rate::join('customers','customers.customer_id','=','rates.customer_id')->join('products','products.id','=','rates.product_id')->select('rates.*','customers.email as customer_email','products.name as product_name', 'products.image as product_image')->orderby('rate_id','desc')->count();
+        $total_pages = ceil($total_count / $per_page);
+        if($page > $total_pages) {
+            $page = $total_pages;
+        }
+        if($page < 1) {
+            $page = 1;
+        }
+        // Tính vị trí bắt đầu của sản phẩm trên trang hiện tại
+        $start = ($page - 1) * $per_page;
+        $all_rate = Rate::join('customers','customers.customer_id','=','rates.customer_id')->join('products','products.id','=','rates.product_id')->select('rates.*','customers.email as customer_email','products.name as product_name', 'products.image as product_image')->orderby('rate_id','desc')->skip($start)
+        ->take($per_page)->get();
+        return view('admin/rate/manage')->with('admin',$admin)->with('all_rate',$all_rate)->with('current_page',$page)->with('total_pages',$total_pages);
     }
     public function delete($id){
-        if(!Session::get('id')){
+        if(!Session::get('id') ){
+            Session::put('error_login', "Vui lòng đăng nhập để thực hiện chức năng!");
             return Redirect::to('admin-login');
         }
         $rate = rate::find($id);
@@ -144,11 +159,13 @@ class RateController extends Controller
             $rate['status'] = 2;
             $rate->update();
         }
-        
+        Session::put('success',"Xóa đánh giá thành công!");
+
         return Redirect::to('admin/rate-manage');
     }
     public function recover($id){
-        if(!Session::get('id')){
+        if(!Session::get('id') ){
+            Session::put('error_login', "Vui lòng đăng nhập để thực hiện chức năng!");
             return Redirect::to('admin-login');
         }
         $rate = rate::find($id);
@@ -156,16 +173,20 @@ class RateController extends Controller
             $rate['status'] = 1;
             $rate->update();
         }
+        Session::put('success',"Khôi phục đánh giá thành công!");
+
         return Redirect::to('admin/rate-manage');
     }
     public function deletedb($id){
-        if(!Session::get('id')){
+        if(!Session::get('id') ){
+            Session::put('error_login', "Vui lòng đăng nhập để thực hiện chức năng!");
             return Redirect::to('admin-login');
         }
         $rate = Rate::find($id);
         if($rate){
             $rate->delete();
         }
+        Session::put('success',"Xóa vĩnh viễn đánh giá thành công");
         return Redirect::to('admin/rate-manage');
     }
 }

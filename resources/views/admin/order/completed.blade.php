@@ -6,6 +6,18 @@
 <div class="col-12">
     <div class="bg-light rounded h-100 p-4">
         <h6 class="mb-4 fs-3">Danh sách đơn hàng đã ký nhận</h6>
+        <?php 
+                    $error = Session::get('error');
+                    $success = Session::get('success');
+                    if($error){
+                        echo '<div class="alert alert-danger">'.$error.'</div>' ;
+                        Session::put('error',null);
+                    }
+                    if($success){
+                        echo '<div class="alert alert-success">'.$success.'</div>' ;
+                        Session::put('success',null);
+                    }
+                    ?>
         <div class="table-responsive">
             <table data-toolbar="#toolbar" data-toggle="table" class="table table-hover">
                 <thead>
@@ -42,18 +54,25 @@
                     </tr>
                 </thead>
                 <tbody>
+                    <?php $new_check =1 ?>
                     @foreach ($all_order as $order)
                  
                     <tr data-index="0">
                         <td style="">
-                            <p>{{$order->order_id}}</p>
-                            <a href="{{URL::to('/admin/order-details/'.$order->order_id)}}">Xem chi tiết</a>
+                            <p>{{$order->order_id}}
+                            <?php if($new_check == 1){
+                                ?>
+                                    <span style="color:red">(New)</span>
+                                <?php
+                                    $new_check = 0;
+                                }?> 
+                            </p>
+                            <a href="{{URL::to('/admin/order-details/'.$order->order_id)}}" id="{{$order->order_id}}">Xem chi tiết</a>
                         </td>
                         <td style="">
                             <p>{{$order->name}}</p>
                             <p>{{$order->phone}}</p>
                         </td>
-                       
                         <td style="">
                             @if($order->code)
                                 <p>{{$order->code}}</p>

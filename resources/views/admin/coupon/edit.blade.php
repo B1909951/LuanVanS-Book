@@ -7,46 +7,52 @@
         <div class="col-sm-12 col-xl-12">
             <div class="bg-light rounded h-100 p-4">
                 <div class="col-md-8">
+                    <h3 class="title text-left">Cập nhật coupon</h3>
+
                     <?php 
                     $error = Session::get('error');
+                    $success = Session::get('success');
                     if($error){
                         echo '<div class="alert alert-danger">'.$error.'</div>' ;
                         Session::put('error',null);
                     }
+                    if($success){
+                        echo '<div class="alert alert-success">'.$success.'</div>' ;
+                        Session::put('success',null);
+                    }
                     ?>
                     <form action="{{URL::to('/admin/coupon-edit-coupon')}}" role="form" method="post" >
                         @csrf
+                        
+
+                        
+                       
                         <input id="id" name="id" type="hidden"  placeholder="" value="{{$coupon_edit->coupon_id}}">
                         <div class="form-group">
                             <label>Mã Coupon</label>
                             <input name="code" class="form-control" placeholder="" value="{{$coupon_edit->code}}" required>
                         </div>
                         <div class="form-group mb-2">
-                            <label>Value</label>
+                            <label>Phần trăm giảm</label>
                             <input name="value" min="0" max="100" type="number" class="form-control" value="{{$coupon_edit->value}}" required> 
                         </div>
-                        <fieldset class="row mb-3">
-                            <legend class="col-form-label col-sm-2 pt-0">Tình trạng</legend>
-                            <div class="col-sm-10">
-                                <div class="form-check">
-                                    <input class="form-check-input1" type="radio" name="status"
-                                        id="gridRadios1" value=0 @if(!$coupon_edit->status) checked @endif>
-                                    <label class="form-check-label" for="gridRadios1">
-                                        Hết hạn
-                                    </label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input1" type="radio" name="status"
-                                        id="gridRadios2" value=1 @if($coupon_edit->status) checked @endif>
-                                    <label class="form-check-label" for="gridRadios2">
-                                        Còn hạn
-                                    </label>
-                                </div>
-                            </div>
-                        </fieldset>
-                        
+                        <div class="form-group">
+                            <label>Mô tả ngắn</label>
+
+                            <textarea name="desc" class="form-control" placeholder=""
+                                id="floatingTextarea" style="height: 50px;">{{$coupon_edit->desc}}</textarea>
+                            <span class="form-message"></span>
+
+                        </div>
+                        <div class="form-group mb-3">
+                            <label>Ngày hết hạn</label>
+                            <input name="expire_at" class="form-control" type="date" value="{{$coupon_edit->expire_at}}" required>
+                            <span class="form-message"></span>
+                        </div>
                         <button type="submit" class="btn btn-success">Cập nhật</button>
-                        <button type="reset" class="btn btn-success">Làm mới</button>
+                        <a href="{{URL::to('/admin/coupon-manage')}}" class="btn btn-danger    ">
+                            Trở về</i>
+                        </a> 
                     </form>
                 </div>
             </div>

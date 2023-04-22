@@ -46,18 +46,32 @@
                             <?php
                             if(Session::get('customer_id')){
                             ?>
-                            <li class="dropdown" ><a href="#"> <i class="fa fa-bell me-lg-2" style="font-size: 20px"><span class="badge" style="color:red; background-color:#ffffff00">New</span></i><i class="fa fa-angle-down"></i></a>
-                                <ul role="menu" class="sub-menu">
+                            <li class="dropdown" ><a href="#"> <i class="fa fa-bell me-lg-2" style="font-size: 20px">
+                                <span class="badge" style="color:red; background-color:#ffffff00; font-size:20px; margin-left:-10px; margin-right:-10px">•
+                                </span></i><i class="fa fa-angle-down"></i></a>
+                                <ul role="menu" class="sub-menu" >
                                     @if(!isset($notif))
-                                    <li style="font-size: 16px; color:#F0F0E9">Không có thông báo nào!</li> 
+                                    <li style="font-size: 16px; color:#F0F0E9;">Không có thông báo nào!</li> 
                                     @endif  
                                     @if(isset($notif))
                                     @foreach($notif as $noti)
-                                        <li style="font-size: 16px; color:#F0F0E9">{{$noti->message}}</li> 
+                                        <li style="font-size: 16px; color:#F0F0E9; ">{{$noti->created_at}}: {{$noti->message}}
+                                        <p style="text-align: center">-----✦-----</p></li> 
                                     @endforeach
                                     @endif 
                                 </ul>
                             </li> 
+                            <style>
+                                .dropdown > ul {
+                                    max-height: 400px;
+                                    overflow: auto;
+                                    }
+
+                                    .dropdown .sub-menu {
+                                      max-height: 400px;
+                                      overflow: auto;
+                                    }       
+                            </style>
                             <?php 
                             }
                             ?>
@@ -66,7 +80,7 @@
                             if($customer_id){
                             ?>
 
-                                <li><a href="{{URL::to('/customer-logout')}}" style="font-size: 20px"><i class="fa fa-unlock-alt"></i>Đăng xuât</a></li>
+                                <li><a href="{{URL::to('/customer-logout')}}" style="font-size: 20px"><i class="fa fa-unlock-alt"></i>Đăng xuất</a></li>
                             <?php
                             }else{
                             ?>

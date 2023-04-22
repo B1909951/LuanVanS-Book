@@ -21,6 +21,8 @@ use Symfony\Component\Process\Process;
 class ProductController extends Controller
 {
     public function create_products1(){
+        ini_set('max_execution_time', 60000);
+
     //tạo file dữ liệu danh sách sản phẩm
     $all_product = Product::where('show','1')->get();
     $data = "Product_ID;Name;Info";
@@ -47,6 +49,8 @@ class ProductController extends Controller
     Storage::disk('local')->put('python/products1.txt', $data);
     }
     public function create_products2(){
+        ini_set('max_execution_time', 60000);
+
         //tạo file dữ liệu danh sách sản phẩm
         $all_product = Product::where('show','1')->get();
         $data = "id;description";
@@ -73,8 +77,9 @@ class ProductController extends Controller
         Storage::disk('local')->put('python/products2.txt', $data);
     }
     public function same_products($pro_id){
+        ini_set('max_execution_time', 60000);
 
-        $process = new Process(["python3", 'D:\Programs\xampp2\htdocs\S-Book\storage\app\python\code2.py', $pro_id], env: [
+        $process = new Process(["python3", 'D:\Programs\xampp\htdocs\S_Book\storage\app\python\code2.py', $pro_id], env: [
             'SYSTEMROOT' => getenv('SYSTEMROOT'),
             'PATH' => getenv("PATH")
           ]);
@@ -103,19 +108,75 @@ class ProductController extends Controller
         return $same_products_id;
 
     }
-    public function manage(){
-        if(!Session::get('id')){
+    // public function page($page){
+    //     if($page == null) $page = 1;
+    //     $cus_id = Session::get('customer_id');
+    //     $notif = Notification::where('customer_id',   $cus_id )->orderby('notif_id','desc')->limit(6)->get();
+    //     $per_page = 9;
+
+    //     // Tính toán số trang
+    //     $total_count = Product::join('categories', 'categories.id', '=', 'products.cate_id')
+    //         ->where('products.show', '1')
+    //         ->where('categories.show', '1')
+    //         ->count();
+    //     $total_pages = ceil($total_count / $per_page);
+    //     if($page > $total_pages) {
+    //         $page = $total_pages;
+    //     }
+    //     if($page < 1) {
+    //         $page = 1;
+    //     }
+    //     // Tính vị trí bắt đầu của sản phẩm trên trang hiện tại
+    //     $start = ($page - 1) * $per_page;
+
+    //     // Lấy các sản phẩm tương ứng với trang hiện tại
+    //     $all_product = Product::join('categories', 'categories.id', '=', 'products.cate_id')
+    //         ->select('products.*', 'products.id as product_id')
+    //         ->where('products.show', '1')
+    //         ->where('categories.show', '1')
+    //         ->orderBy('product_id', 'desc')
+    //         ->skip($start)
+    //         ->take($per_page)
+    //         ->get();
+
+        
+        
+        
+        
+    //     $all_category = DB::table('categories')->where('categories.show','1')->get();
+    //     $all_genre = DB::table('genres')->where('genres.show','1')->get();
+    //     $product_genres = Product_genre::All();
+    //     return view('shop/page')->with('all_product',$all_product)->with('product_genres',$product_genres)->with('all_genre',$all_genre)->with('all_category',$all_category)->with('notif',$notif)
+    //     ->with('current_page',$page)->with('total_pages',$total_pages);
+    // }
+    public function manage($page = 1){
+        if(!Session::get('id') ){
+            Session::put('error_login', "Vui lòng đăng nhập để thực hiện chức năng!");
             return Redirect::to('admin-login');
         }
         $admin = Admin::where('admin_id',Session::get('id'))->get();
-        $all_product = Product::orderby('id','desc')->get();
+        $per_page = 10;
+        // Tính toán số trang
+        $total_count = Product::orderby('id','desc')->count();;
+        $total_pages = ceil($total_count / $per_page);
+        if($page > $total_pages) {
+            $page = $total_pages;
+        }
+        if($page < 1) {
+            $page = 1;
+        }
+        // Tính vị trí bắt đầu của sản phẩm trên trang hiện tại
+        $start = ($page - 1) * $per_page;
+        $all_product = Product::orderby('id','desc')->skip($start)
+        ->take($per_page)->get();
         $pro_genres = Product_genre::all();
         $categories = Category::all();
-        return view('admin/product/manage')->with('admin',$admin)->with('categories',$categories)->with('all_product',$all_product)->with('pro_genres',$pro_genres);
+        return view('admin/product/manage')->with('admin',$admin)->with('categories',$categories)->with('all_product',$all_product)->with('pro_genres',$pro_genres)->with('current_page',$page)->with('total_pages',$total_pages);
     }
 
     public function add(){
-        if(!Session::get('id')){
+        if(!Session::get('id') ){
+            Session::put('error_login', "Vui lòng đăng nhập để thực hiện chức năng!");
             return Redirect::to('admin-login');
         }
         $admin = Admin::where('admin_id',Session::get('id'))->get();
@@ -124,11 +185,12 @@ class ProductController extends Controller
         return view('admin/product/add')->with('admin',$admin)->with('all_genre',$all_genre)->with('categories',$categories);
     }
     public function add_product(Request $request){
-        if(!Session::get('id')){
+        if(!Session::get('id') ){
+            Session::put('error_login', "Vui lòng đăng nhập để thực hiện chức năng!");
             return Redirect::to('admin-login');
         }
         $product = new Product();
-        $result = DB::table('products')->where('name',$request->name)->first();
+        $result = DB::table('products')->where('name',$request->name)->whereIn('show', ["0", "1"])->first();
             if($result){
                 Session::put('error',"Sản phẩm đã tồn tại!");
                 return Redirect::to('admin/product-add');
@@ -163,33 +225,42 @@ class ProductController extends Controller
                 $product_genre->save();
             }
         }
-        
         $this->create_products1();
         $this->create_products2();
-        $arr_id = $this->same_products($pro_id);
-        foreach($arr_id as $item){
-            $pro_recommend = new Product_recommend();
-            $pro_recommend['product_id']=$pro_id;
-            $pro_recommend['product_recommend_id']=$item;
-            $pro_recommend->save();
-        }
-        return redirect()->back()->with('success', 'Thêm sản phẩm thành công');
+        // $arr_id = $this->same_products($pro_id);
+        
+        // foreach($arr_id as $item){
+        //     $pro_recommend = new Product_recommend();
+        //     $pro_recommend['product_id']=$pro_id;
+        //     $pro_recommend['product_recommend_id']=$item;
+        //     $pro_recommend->save();
+        // }
+        
+        return redirect()->back()->with('success', 'Thêm sản phẩm thành công!');
     }
     public function delete($id){
-        if(!Session::get('id')){
+        if(!Session::get('id') ){
+            Session::put('error_login', "Vui lòng đăng nhập để thực hiện chức năng!");
             return Redirect::to('admin-login');
         }
         $product = Product::find($id);
         if($product){
             $product['show']=2;
             $product->update();
+            Session::put('success',"Xóa sản phẩm thành công!");
+
+        }else{
+            Session::put('error',"Sản phẩm không tồn tại!");
+
         }
         $this->create_products1();
         $this->create_products2();
+        
         return Redirect::to('admin/product-manage');
     }
     public function recover($id){
-        if(!Session::get('id')){
+        if(!Session::get('id') ){
+            Session::put('error_login', "Vui lòng đăng nhập để thực hiện chức năng!");
             return Redirect::to('admin-login');
         }
         $product = Product::find($id);
@@ -202,7 +273,8 @@ class ProductController extends Controller
         return Redirect::to('admin/product-manage');
     }
     public function deletedb($id){
-        if(!Session::get('id')){
+        if(!Session::get('id') ){
+            Session::put('error_login', "Vui lòng đăng nhập để thực hiện chức năng!");
             return Redirect::to('admin-login');
         }
         $product = Product::find($id);
@@ -214,7 +286,8 @@ class ProductController extends Controller
         return Redirect::to('admin/product-manage');
     }
     public function edit($id){
-        if(!Session::get('id')){
+        if(!Session::get('id') ){
+            Session::put('error_login', "Vui lòng đăng nhập để thực hiện chức năng!");
             return Redirect::to('admin-login');
         }
         $product_edit = Product::find($id);
@@ -223,15 +296,16 @@ class ProductController extends Controller
         $categories = Category::all();
 
         $pro_genres = Product_genre::all();        
-
-        return view('admin/product/edit')->with('admin',$admin)->with('product_edit',$product_edit)->with('all_genre',$all_genre)->with('pro_genres',$pro_genres)->with('categories',$categories);
+        $pro_recommend = Product_recommend::where('product_id',$id)->join('products','products.id','=','pro_recommend_products.product_recommend_id')->select('products.*')->distinct()->get();
+        return view('admin/product/edit')->with('admin',$admin)->with('product_edit',$product_edit)->with('all_genre',$all_genre)->with('pro_genres',$pro_genres)->with('categories',$categories)->with('pro_recommend',$pro_recommend);
     }
     public function edit_product(request $request){
-        if(!Session::get('id')){
+        if(!Session::get('id') ){
+            Session::put('error_login', "Vui lòng đăng nhập để thực hiện chức năng!");
             return Redirect::to('admin-login');
         }
         $product = Product::find($request->id);
-        $result = DB::table('products')->where('name',$request->name)->first();
+        $result = DB::table('products')->where('name',$request->name)->whereIn('show', ["0", "1"])->first();
             if($result && $request->id !=($result->id)){
                 Session::put('error',"Sản phẩm đã tồn tại!");
                 return Redirect::to('admin/product-edit/'.$request->id);
@@ -277,11 +351,11 @@ class ProductController extends Controller
         
         $this->create_products1();
         $this->create_products2();
-        session::put('success',"Đã cập nhật sản phẩm!");
+        session::put('success',"Cập nhật sản phẩm thành công!");
         return redirect()->back();
     }
     public function add_product_recommend(){
-        ini_set('max_execution_time', 6000);
+        ini_set('max_execution_time', 60000);
         Product_recommend::query()->delete();
         $all_product = Product::all();
  

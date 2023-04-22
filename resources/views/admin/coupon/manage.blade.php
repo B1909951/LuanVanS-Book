@@ -6,20 +6,45 @@
 <div class="col-12">
     <div class="bg-light rounded h-100 p-4">
         <h6 class="mb-4 fs-3">Danh sách Coupon</h6>
+        <?php 
+                    $error = Session::get('error');
+                    $success = Session::get('success');
+                    if($error){
+                        echo '<div class="alert alert-danger">'.$error.'</div>' ;
+                        Session::put('error',null);
+                    }
+                    if($success){
+                        echo '<div class="alert alert-success">'.$success.'</div>' ;
+                        Session::put('success',null);
+                    }
+                    ?>     
         <div class="table-responsive">
             <div id="toolbar" class="btn-group">
                 <a href="{{URL::to('/admin/coupon-add')}}" class="btn btn-success">
                     <i class="glyphicon glyphicon-plus"></i> Thêm Coupon
                 </a>
             </div>
+            <!-- Spinner Start -->
+            <div id="spinner-recommend" class="show bg-white position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center d-none loading_create_list" style="z-index: 10000; opacity: 0.8;">
+                <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
+                <span class="sr-only" ">Loading...</span>
+                </div>
+                <br>
+                <span style="color: black; padding-left:10px">Đang gửi coupon đến khách hàng</span>
+
+            </div>
+        <!-- Spinner End -->
+            <div id="toolbar" class="btn-group" >
+                <a id="create_list" href="{{URL::to('/admin/coupon/send-coupon')}}"><button class="btn btn-primary" ><i class="glyphicon glyphicon-mail" ></i>Gửi coupon</button></a>
+            </div>
             <table data-toolbar="#toolbar" data-toggle="table" class="table table-hover">
                 <thead>
                     <tr>
                         <th style="">
-                            <div class="th-inner sortable">ID</div>
+                            <div class="th-inner sortable" width = 10%>ID</div>
                             <div class="fht-cell"></div>
                         </th>
-                        <th style="">
+                        <th style="" width = 20%>
                             <div class="th-inner sortable">Mã Coupon</div>
                             <div class="fht-cell"></div>
                         </th>
@@ -28,10 +53,14 @@
                             <div class="fht-cell"></div>
                         </th>
                         <th style="">
-                            <div class="th-inner sortable">Trạng thái</div>
+                            <div class="th-inner sortable" width = 30%>Mô tả</div>
                             <div class="fht-cell"></div>
                         </th>
                         <th style="">
+                            <div class="th-inner sortable">Ngày hết hạn</div>
+                            <div class="fht-cell"></div>
+                        </th>
+                        <th style="text-align: right">
                             <div class="th-inner ">Hành động</div>
                             <div class="fht-cell"></div>
                         </th>
@@ -45,15 +74,17 @@
                         <td style="">{{$coupon->coupon_id}}</td>
                         <td style="">{{$coupon->code}}</td>
                         <td style="">{{$coupon->value}}%</td>
-                        <td style="">@if($coupon->status==1)Còn hạn @else Hết hạn @endif</td>
-                        <td class="form-group" style="">
+                        <td style="">{{$coupon->desc}}</td>
+
+                        @if($coupon->expire_at >= date('Y-m-d'))<td style="color: green">{{$coupon->expire_at}}</td> @else <td style="color: red">{{$coupon->expire_at}}</td> @endif
+                        <td class="form-group" style="text-align: right; margin-right:10%">
                             <a href="{{URL::to('/admin/coupon-edit/'.$coupon->coupon_id)}}" class="btn btn-primary">
                                 <i class="fas fa-pen"></i>
                             </a>
                             <a  onclick="return confirm('Bạn có muốn xóa coupon này?')"  href="{{URL::to('/admin/coupon-delete/'.$coupon->coupon_id)}}" class="btn btn-danger">
                                 <i class="fa fa-trash"></i>
                             </a>
-                        </td>
+                        </td> 
                     </tr>
                     @endif
                     @endforeach
@@ -65,7 +96,7 @@
 </div>
 </div>
 
-<div class="container-fluid pt-4 px-4">
+{{-- <div class="container-fluid pt-4 px-4">
     <div class="row g-4">
     <div class="col-12">
         <div class="bg-light rounded h-100 p-4">
@@ -75,10 +106,10 @@
                     <thead>
                         <tr>
                             <th style="">
-                                <div class="th-inner sortable">ID</div>
+                                <div class="th-inner sortable" width = 10%>ID</div>
                                 <div class="fht-cell"></div>
                             </th>
-                            <th style="">
+                            <th style=""  width = 20%>
                                 <div class="th-inner sortable">Mã Coupon</div>
                                 <div class="fht-cell"></div>
                             </th>
@@ -87,10 +118,13 @@
                                 <div class="fht-cell"></div>
                             </th>
                             <th style="">
-                                <div class="th-inner sortable">Trạng thái</div>
+                                <div class="th-inner sortable" width = 30%>Mô tả</div>
                                 <div class="fht-cell"></div>
                             </th>
-                            
+                            <th style="">
+                                <div class="th-inner sortable">Ngày hết hạn</div>
+                                <div class="fht-cell"></div>
+                            </th>
                             <th style="">
                                 <div class="th-inner ">Hành động</div>
                                 <div class="fht-cell"></div>
@@ -105,13 +139,15 @@
                             <td style="">{{$coupon->coupon_id}}</td>
                             <td style="">{{$coupon->code}}</td>
                             <td style="">{{$coupon->value}}%</td>
-                            <td style="">@if($coupon->status==1)Còn hạn @else Hết hạn @endif</td>
+                            <td style="">{{$coupon->desc}}</td>
+    
+                            @if($coupon->expire_at >= date('Y-m-d'))<td style="color: green">{{$coupon->expire_at}}</td> @else <td style="color: red">{{$coupon->expire_at}}</td> @endif
                             <td class="form-group" style="">
-                                <a onclick="return confirm('Bạn có muốn khôi phục coupon đã xóa này?')" href="{{URL::to('/admin/coupon-recover/'.$coupon->coupon_id)}}" class="btn btn-primary">
-                                    <i class="fa fa-undo"></i>
+                                <a href="{{URL::to('/admin/coupon-edit/'.$coupon->coupon_id)}}" class="btn btn-primary">
+                                    <i class="fas fa-pen"></i>
                                 </a>
-                                <a onclick="return confirm('Hành động ảnh hưởng đến cơ sở dữ liệu!!! Bạn có muốn xóa vĩnh viễn coupon này khỏi cơ sở dữ liệu?')" href="{{URL::to('/admin/coupon-deletedb/'.$coupon->coupon_id)}}" class="btn btn-danger">
-                                    <i class="fas fa-times"></i>
+                                <a  onclick="return confirm('Bạn có muốn xóa coupon này?')"  href="{{URL::to('/admin/coupon-delete/'.$coupon->coupon_id)}}" class="btn btn-danger">
+                                    <i class="fa fa-trash"></i>
                                 </a>
                             </td>
                         </tr>
@@ -123,5 +159,5 @@
         </div>
     </div>
     </div>
-    </div>
+    </div> --}}
 @endsection
